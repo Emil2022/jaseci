@@ -34,29 +34,21 @@ graph faq {
 
 walker init {
     root {
-        spawn here --> node::faq_root;
-        spawn here walker::ingest_faq(kb_file="tesla_faq.json");
+        spawn here --> graph::faq;
         spawn here walker::ask;
     }
 }
 
-
 walker ask {
-    can use.qa_classify;
     has question;
     root {
-        question = std.input(">");
+        question = std.input("AMA > ");
         take --> node::faq_root;
     }
     faq_root {
-        answers = -->.answer;
-        best_answer = use.qa_classify(
-            text = question,
-            classes = answers
-        );
-        take --> node::faq_state(answer==best_answer["match"]);
+        take --> node::faq_state(question==question);
     }
-    faq_state {
+    faq_state {:
         std.out(here.answer);
     }
 }
